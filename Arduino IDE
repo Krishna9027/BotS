@@ -1,0 +1,62 @@
+#include <ESP8266WiFi.h>
+
+
+WiFiClient client;
+WiFiServer server(80);
+
+
+const char* ssid = "realme 9 Pro 5G";      
+const char* password = "velenquish";  
+
+String  data =""; 
+
+
+int leftMotorForward = D1;  /*IN3   */
+
+int rightMotorForward = D2;   /* IN1  */
+
+int leftMotorBackward = D5;    /*  IN4   */
+
+int rightMotorBackward = D6;  /*  IN2  */
+
+int speedcar = 150;    /0 to 255/
+
+
+
+
+
+
+
+
+void setup() {
+
+  Serial.begin(115200);
+  delay(10);
+
+  // Connect to WiFi network
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+
+
+   pinMode(leftMotorForward, OUTPUT);
+
+  pinMode(rightMotorForward, OUTPUT);
+
+   pinMode(leftMotorBackward, OUTPUT);
+
+    pinMode(rightMotorBackward, OUTPUT);
+
+  server.begin();
+}
