@@ -1,0 +1,194 @@
+#include <ESP8266WiFi.h>
+
+
+WiFiClient client;
+WiFiServer server(80);
+
+
+const char* ssid = "realme 9 Pro 5G";      
+const char* password = "velenquish";  
+
+String  data =""; 
+
+
+int leftMotorForward = D1;  /*IN3   */
+
+int rightMotorForward = D2;   /* IN1  */
+
+int leftMotorBackward = D5;    /*  IN4   */
+
+int rightMotorBackward = D6;  /*  IN2  */
+
+int speedcar = 150;    /*0 to 255*/
+
+
+
+
+
+
+
+
+void setup() {
+
+  Serial.begin(115200);
+  delay(10);
+
+  // Connect to WiFi network
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+
+
+   pinMode(leftMotorForward, OUTPUT);
+
+  pinMode(rightMotorForward, OUTPUT);
+
+   pinMode(leftMotorBackward, OUTPUT);
+
+    pinMode(rightMotorBackward, OUTPUT);
+
+  server.begin();
+}
+
+void loop() {
+  
+  client = server.available();
+
+  if (!client) return;
+
+  data = checkClient ();
+  Serial.println(data);
+  
+
+
+//  defining speed to control car speed
+ 
+if (data=="hs")speedcar=  255  ;
+
+
+else if (data=="ms")speedcar=   150 ;
+
+else if (data=="ls")speedcar=   90 ; 
+
+
+  if (data == "F") MotorForward();
+
+  else if (data == "B") MotorBackward();
+
+  else if (data == "L") TurnLeft();
+
+  else if (data == "R") TurnRight();
+
+  else if (data == "S") MotorStop();
+
+
+ 
+          
+
+} 
+void MotorForward(void)
+
+{
+
+analogWrite(leftMotorForward,speedcar);
+
+analogWrite(rightMotorForward,speedcar); 
+
+digitalWrite(leftMotorBackward,LOW);
+
+digitalWrite(rightMotorBackward,LOW);
+
+}
+
+void MotorBackward(void) 
+
+{
+
+analogWrite(leftMotorBackward,speedcar);
+
+analogWrite(rightMotorBackward,speedcar);
+
+digitalWrite(leftMotorForward,LOW);
+
+digitalWrite(rightMotorForward,LOW);
+
+}
+void TurnLeft(void)
+
+{
+
+Serial.println("left is running");
+
+digitalWrite(leftMotorForward,LOW);
+
+analogWrite(rightMotorForward,speedcar);
+
+digitalWrite(rightMotorBackward,LOW);
+
+digitalWrite(leftMotorBackward,LOW);
+
+}
+void TurnRight(void)
+
+{
+Serial.println("right is running");
+
+analogWrite(leftMotorForward,speedcar);
+
+digitalWrite(rightMotorForward,LOW);
+
+digitalWrite(rightMotorBackward,LOW);
+
+digitalWrite(leftMotorBackward,LOW);
+
+}
+
+void MotorStop(void) 
+
+ {
+
+digitalWrite(leftMotorForward,LOW);
+
+digitalWrite(leftMotorBackward,LOW);
+
+digitalWrite(rightMotorForward,LOW); 
+
+digitalWrite(rightMotorBackward,LOW);
+
+}
+/**RECEIVE DATA FROM the APP **/
+
+String checkClient (void)
+
+{
+
+// while(!client.available()) delay(1); 
+
+String request = client.readStringUntil('\r');
+
+Serial.println(request);
+
+request.remove(0, 5);
+
+request.remove(request.length()-9,9);
+
+Serial.println(request);
+
+return request;
+
+}
+
+
+
+
